@@ -9,64 +9,32 @@ local AI = require("app.logic.AI")
 function MainScene:onCreate()
 	local layer = cc.Layer:create()
 	self:addChild(layer)
-	local spriteFrameCache = cc.SpriteFrameCache:getInstance()
-	spriteFrameCache:addSpriteFrames("frame/card.plist")
-	spriteFrameCache:addSpriteFrames("bg/background.plist")
-	spriteFrameCache:addSpriteFrames("btn/button.plist")
-	local bg = cc.Sprite:create()
-	bg:setSpriteFrame("bg_1.png")
-	bg:setPosition(display.cx, display.cy)
-	layer:addChild(bg)
-
-	local stable = cc.Sprite:create()
-	stable:setSpriteFrame("bg_table.png")
-	stable:setPosition(stable:getContentSize().width/2, display.cy)
-	layer:addChild(stable)
-	local allCard = mod.makeCards()
-	mod.sortCard(allCard)
+	self:initSpriteFrameCache() --加载plist缓存
+	local allCard = mod.makeCards() --生成牌
+	self:initBackgroundUI(layer, allCard) --加载背景图片并把牌加载到背景
+	-- mod.sortCard(allCard)
 	-- dump(allCard)
-	local beginX = stable:getContentSize().width/4
-    for i,v in ipairs(allCard) do
-    	local w = 0
-    	for j, p in pairsByKeys(v) do
-			for k,q in pairsByKeys(p) do
-				local card = nil
-				if i == 1 then
-		    		card = Card.new(q, j, "middle")
-					card:setPosition(beginX * 1.6 + w * card:getWidth() * 0.6, display.top - card:getHeight() * 0.8)
-					w = w + 1
-					stable:addChild(card)	    
-				else
-					card = Card.new(q, j, "big")
-					w = w + 1
-					stable:addChild(card)
-				end	
-				TableUtils.insertCardList(i, card)
-			end
-		end
-    end
-    local myCardList = TableUtils.getCardList(2)
-    self:refreshCard1Position()
+    self:setCenterUserPosition()
 
-	local leftCardList = TableUtils.getCardList(3)
-	local beginY = (display.height + 50 - (25 * (#leftCardList - 1) + leftCardList[1]:getWidth()))/2
-	for i, v in pairsByKeys(leftCardList) do
-		v:setRotation(90)
-		v:setScale(0.8)
-		v:changePosition()
-		v:setPosition(v:getHeight() * 0.6 * 0.8, beginY + i * 25 * 0.8)
-	end
-	local rightCardList = TableUtils.getCardList(4)
-	for i, v in pairsByKeys(rightCardList) do
-		v:setRotation(-90)
-		v:setScale(0.8)
-		v:setPosition(display.width - v:getHeight() * 0.6 * 0.8, beginY + i * 25 * 0.8)
-	end
+	self:setLeftUserPosition()   -- 设置左用户位置
 
+	self:setRightUserPosition()  --设置右用户位置
+
+	self:initClickListener(layer) --选牌listener
+
+	self:createChuPaiButton(layer)
+
+	local ai = AI.new(allCard[2])
+	ai:getHandCardNum()
+	-- AI.new(allCard[3])
+	-- AI.new(allCard[4])
+end
+
+function MainScene:createChuPaiButton(layer)
 	local chupaiTable = {}
 	local chupai = cc.Sprite:create("btn/btn_blue_small.png")
 	-- chupai:init("btn_blue_big_1.png", "btn_blue_big_2.png", "btn_blue_big_1.png", ccui.TextureResType.plistType)
-	chupai:setPosition(display.cx, myCardList[1]:getPositionY() + chupai:getContentSize().height * 1.5 + myCardList[1]:getHeight()/2)
+	chupai:setPosition(display.cx, TableUtils.getCardList(2)[1]:getPositionY() + chupai:getContentSize().height * 1.5 + TableUtils.getCardList(2)[1]:getHeight()/2)
 	local font = cc.Sprite:create("fonts/btnfont_chupai.png")
 	font:setPosition(chupai:getContentSize().width/2, chupai:getContentSize().height/2 - 3)
 	chupai:addChild(font)
@@ -99,8 +67,6 @@ function MainScene:onCreate()
 				w = w + 1
 				TableUtils.removeCardFromList(2, card)
 				table.insert(chupaiTable, card)
-				-- card:removeFromParent()
-				-- card:setPosition(display.cx + w * 25, display.cy)
 			end
 		end
 		local beginX = (display.width - (25 * (#chupaiTable - 1) + chupaiTable[1]:getWidth()))/2
@@ -114,25 +80,81 @@ function MainScene:onCreate()
 			zOrder = zOrder + 1
 			-- layer:addChild(v)
 		end
-		self:refreshCard1Position()
+		self:setCenterUserPosition()
 	end, cc.Handler.EVENT_TOUCH_ENDED)
 	local dispatcher = cc.Director:getInstance():getEventDispatcher()
 	dispatcher:addEventListenerWithSceneGraphPriority(listener, chupai)
 	layer:addChild(chupai)
-	self:initClickListener(layer)
-	local ai = AI.new(allCard[2])
-	ai:getHandCardNum()
-	-- AI.new(allCard[3])
-	-- AI.new(allCard[4])
 end
 
-function MainScene:refreshCard1Position()
+function MainScene:setCenterUserPosition()
     local myCardList = TableUtils.getCardList(2)
     if #myCardList <= 0 then return end
     local beginX = (display.width - (25 * (#myCardList - 1) + myCardList[1]:getWidth()))/2
 	for i, v in pairsByKeys(myCardList) do
 		v:setPosition(beginX + 50 + (i - 1) * 25 , v:getHeight() * 0.6)
 	end
+end
+
+function MainScene:setRightUserPosition()
+	local rightCardList = TableUtils.getCardList(4)
+	local beginY = (display.height + 50 - (25 * (#rightCardList - 1) + rightCardList[1]:getWidth()))/2
+	for i, v in pairsByKeys(rightCardList) do
+		v:setRotation(-90)
+		v:setScale(0.8)
+		v:setPosition(display.width - v:getHeight() * 0.6 * 0.8, beginY + i * 25 * 0.8)
+	end
+end
+
+function MainScene:setLeftUserPosition()
+	local leftCardList = TableUtils.getCardList(3)
+	local beginY = (display.height + 50 - (25 * (#leftCardList - 1) + leftCardList[1]:getWidth()))/2
+	for i, v in pairsByKeys(leftCardList) do
+		v:setRotation(90)
+		v:setScale(0.8)
+		v:changePosition()
+		v:setPosition(v:getHeight() * 0.6 * 0.8, beginY + i * 25 * 0.8)
+	end
+end
+
+function MainScene:initBackgroundUI(layer, allCard)
+	local bg = cc.Sprite:create()	--背景
+	bg:setSpriteFrame("bg_1.png")
+	bg:setPosition(display.cx, display.cy)
+	layer:addChild(bg)
+
+	local stable = cc.Sprite:create()
+	stable:setSpriteFrame("bg_table.png")
+	stable:setPosition(stable:getContentSize().width/2, display.cy)
+	layer:addChild(stable)
+
+	local beginX = stable:getContentSize().width/4
+    for i,v in ipairs(allCard) do
+    	local w = 0
+    	for j, p in pairsByKeys(v) do
+			for k,q in pairsByKeys(p) do
+				local card = nil
+				if i == 1 then
+		    		card = Card.new(q, j, "middle")
+					card:setPosition(beginX * 1.6 + w * card:getWidth() * 0.6, display.top - card:getHeight() * 0.8)
+					w = w + 1
+					stable:addChild(card)	    
+				else
+					card = Card.new(q, j, "big")
+					w = w + 1
+					stable:addChild(card)
+				end	
+				TableUtils.insertCardList(i, card)
+			end
+		end
+    end
+end
+
+function MainScene:initSpriteFrameCache()
+	local spriteFrameCache = cc.SpriteFrameCache:getInstance()
+	spriteFrameCache:addSpriteFrames("frame/card.plist")
+	spriteFrameCache:addSpriteFrames("bg/background.plist")
+	spriteFrameCache:addSpriteFrames("btn/button.plist")
 end
 
 function MainScene:initClickListener(layer)
