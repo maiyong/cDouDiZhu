@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>E439935D-B2A2-46AE-856D-2AA408428F33</ProjectGuid>
+    <!--$guid1$-->
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+    <Folder Include="src\app\" />
+    <Folder Include="src\app\logic\" />
+    <Folder Include="src\app\model\" />
+    <Folder Include="src\app\views\" />
+    <Folder Include="src\cocos\" />
+    <Folder Include="src\cocos\3d\" />
+    <Folder Include="src\cocos\cocos2d\" />
+    <Folder Include="src\cocos\cocosbuilder\" />
+    <Folder Include="src\cocos\cocosdenshion\" />
+    <Folder Include="src\cocos\cocostudio\" />
+    <Folder Include="src\cocos\controller\" />
+    <Folder Include="src\cocos\extension\" />
+    <Folder Include="src\cocos\framework\" />
+    <Folder Include="src\cocos\framework\components\" />
+    <Folder Include="src\cocos\framework\extends\" />
+    <Folder Include="src\cocos\network\" />
+    <Folder Include="src\cocos\physics3d\" />
+    <Folder Include="src\cocos\spine\" />
+    <Folder Include="src\cocos\ui\" />
+    <Folder Include="src\packages\" />
+    <Folder Include="src\packages\mvc\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\app\define.lua" />
+    <Compile Include="src\app\logic\AI.lua" />
+    <Compile Include="src\app\logic\makecards.lua" />
+    <Compile Include="src\app\logic\selectCard.lua" />
+    <Compile Include="src\app\model\Card.lua" />
+    <Compile Include="src\app\MyApp.lua" />
+    <Compile Include="src\app\TableUtils.lua" />
+    <Compile Include="src\app\TagUtils.lua" />
+    <Compile Include="src\app\views\MainScene.lua" />
+    <Compile Include="src\cocos\3d\3dConstants.lua" />
+    <Compile Include="src\cocos\cocos2d\bitExtend.lua" />
+    <Compile Include="src\cocos\cocos2d\Cocos2d.lua" />
+    <Compile Include="src\cocos\cocos2d\Cocos2dConstants.lua" />
+    <Compile Include="src\cocos\cocos2d\deprecated.lua" />
+    <Compile Include="src\cocos\cocos2d\DeprecatedCocos2dClass.lua" />
+    <Compile Include="src\cocos\cocos2d\DeprecatedCocos2dEnum.lua" />
+    <Compile Include="src\cocos\cocos2d\DeprecatedCocos2dFunc.lua" />
+    <Compile Include="src\cocos\cocos2d\DeprecatedOpenglEnum.lua" />
+    <Compile Include="src\cocos\cocos2d\DrawPrimitives.lua" />
+    <Compile Include="src\cocos\cocos2d\functions.lua" />
+    <Compile Include="src\cocos\cocos2d\json.lua" />
+    <Compile Include="src\cocos\cocos2d\luaj.lua" />
+    <Compile Include="src\cocos\cocos2d\luaoc.lua" />
+    <Compile Include="src\cocos\cocos2d\Opengl.lua" />
+    <Compile Include="src\cocos\cocos2d\OpenglConstants.lua" />
+    <Compile Include="src\cocos\cocosbuilder\CCBReaderLoad.lua" />
+    <Compile Include="src\cocos\cocosbuilder\DeprecatedCocosBuilderClass.lua" />
+    <Compile Include="src\cocos\cocosdenshion\AudioEngine.lua" />
+    <Compile Include="src\cocos\cocosdenshion\DeprecatedCocosDenshionClass.lua" />
+    <Compile Include="src\cocos\cocosdenshion\DeprecatedCocosDenshionFunc.lua" />
+    <Compile Include="src\cocos\cocostudio\CocoStudio.lua" />
+    <Compile Include="src\cocos\cocostudio\DeprecatedCocoStudioClass.lua" />
+    <Compile Include="src\cocos\cocostudio\DeprecatedCocoStudioFunc.lua" />
+    <Compile Include="src\cocos\cocostudio\StudioConstants.lua" />
+    <Compile Include="src\cocos\controller\ControllerConstants.lua" />
+    <Compile Include="src\cocos\extension\DeprecatedExtensionClass.lua" />
+    <Compile Include="src\cocos\extension\DeprecatedExtensionEnum.lua" />
+    <Compile Include="src\cocos\extension\DeprecatedExtensionFunc.lua" />
+    <Compile Include="src\cocos\extension\ExtensionConstants.lua" />
+    <Compile Include="src\cocos\framework\audio.lua" />
+    <Compile Include="src\cocos\framework\components\event.lua" />
+    <Compile Include="src\cocos\framework\device.lua" />
+    <Compile Include="src\cocos\framework\display.lua" />
+    <Compile Include="src\cocos\framework\extends\LayerEx.lua" />
+    <Compile Include="src\cocos\framework\extends\MenuEx.lua" />
+    <Compile Include="src\cocos\framework\extends\NodeEx.lua" />
+    <Compile Include="src\cocos\framework\extends\SpriteEx.lua" />
+    <Compile Include="src\cocos\framework\extends\UICheckBox.lua" />
+    <Compile Include="src\cocos\framework\extends\UIEditBox.lua" />
+    <Compile Include="src\cocos\framework\extends\UIListView.lua" />
+    <Compile Include="src\cocos\framework\extends\UIPageView.lua" />
+    <Compile Include="src\cocos\framework\extends\UIScrollView.lua" />
+    <Compile Include="src\cocos\framework\extends\UISlider.lua" />
+    <Compile Include="src\cocos\framework\extends\UITextField.lua" />
+    <Compile Include="src\cocos\framework\extends\UIWidget.lua" />
+    <Compile Include="src\cocos\framework\init.lua" />
+    <Compile Include="src\cocos\framework\package_support.lua" />
+    <Compile Include="src\cocos\framework\transition.lua" />
+    <Compile Include="src\cocos\init.lua" />
+    <Compile Include="src\cocos\network\DeprecatedNetworkClass.lua" />
+    <Compile Include="src\cocos\network\DeprecatedNetworkEnum.lua" />
+    <Compile Include="src\cocos\network\DeprecatedNetworkFunc.lua" />
+    <Compile Include="src\cocos\network\NetworkConstants.lua" />
+    <Compile Include="src\cocos\physics3d\physics3d-constants.lua" />
+    <Compile Include="src\cocos\spine\SpineConstants.lua" />
+    <Compile Include="src\cocos\ui\DeprecatedUIEnum.lua" />
+    <Compile Include="src\cocos\ui\DeprecatedUIFunc.lua" />
+    <Compile Include="src\cocos\ui\experimentalUIConstants.lua" />
+    <Compile Include="src\cocos\ui\GuiConstants.lua" />
+    <Compile Include="src\config.lua" />
+    <Compile Include="src\main.lua" />
+    <Compile Include="src\packages\mvc\AppBase.lua" />
+    <Compile Include="src\packages\mvc\init.lua" />
+    <Compile Include="src\packages\mvc\ViewBase.lua" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

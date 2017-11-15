@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>bg_1.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{1024,768}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{1024,768}</string>
+			</dict>
+			<key>bg_stool.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1268,498},{150,100}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{150,100}</string>
+			</dict>
+			<key>bg_table.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{768,0},{1000,500}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{1000,500}</string>
+			</dict>
+			<key>bg_title.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1768,0},{498,99}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{498,99}</string>
+			</dict>
+			<key>clock.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1418,498},{79,89}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{79,89}</string>
+			</dict>
+			<key>famer_man.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1867,0},{170,220}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{170,220}</string>
+			</dict>
+			<key>famer_woman.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1867,420},{170,205}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{170,205}</string>
+			</dict>
+			<key>landholder_man.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1268,625},{155,200}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{155,200}</string>
+			</dict>
+			<key>landholder_woman.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1867,220},{180,200}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{180,200}</string>
+			</dict>
+			<key>welcome.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1268,0},{500,256}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{500,256}</string>
+			</dict>
+			<key>ok.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{1268,256},{71,89}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{71,89}</string>
+			</dict>
+		</dict>
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>textureFileName</key>
+			<string>background.png</string>
+			<key>realTextureFileName</key>
+			<string>background.png</string>
+			<key>size</key>
+			<string>{2047,1024}</string>
+		</dict>
+		<key>texture</key>
+		<dict>
+			<key>width</key>
+			<integer>2047</integer>
+			<key>height</key>
+			<integer>1024</integer>
+		</dict>
+	</dict>
+</plist>
