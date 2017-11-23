@@ -12,6 +12,14 @@ function AI.new(list)
 	local self = {}
 	setmetatable(self, AI)
 	self.list = list
+	self.isBuJiaoDiZhu = false
+	self.isJiaoDiZhu = false
+	self.isBeginUser = false
+	self.backuplist = {}
+	for k,v in pairs(self.list) do
+		self.backuplist[k] = self.backuplist[k] or {}
+		self.backuplist[k] = list[k] 
+	end
 	self:classfyCard()
 	return self
 end
@@ -25,15 +33,37 @@ function AI:classfyCard()
 	self.straightTable, self.list = AI.classfyStraight(self.threeTable, self.list)
 	self.doubleStraightTable = AI.classfyDoubleStraight(self.straightTable, self.list)
 	-- self.doubleTable = AI.classfyDouble(self.list)
-	dump(self.kingTable, "王")--王
-	dump(self.boomTable, "炸弹")--炸弹
-	dump(self.threeTable, "三条")--三条
-	dump(self.threethreeTable, "三顺")--三顺
-	dump(self.straightTable, "顺子")--顺子
-	dump(self.doubleStraightTable, "双顺")--双顺
-	dump(self.doubleTable, "对子")
-	dump(self.list, "其他牌")--其他
+	-- dump(self.kingTable, "王")--王
+	-- dump(self.boomTable, "炸弹")--炸弹
+	-- dump(self.threeTable, "三条")--三条
+	-- dump(self.threethreeTable, "三顺")--三顺
+	-- dump(self.straightTable, "顺子")--顺子
+	-- dump(self.doubleStraightTable, "双顺")--双顺
+	-- dump(self.doubleTable, "对子")
+	-- dump(self.list, "其他牌")--其他
+	-- dump(self.backuplist, "备份list")
+end
 
+--假定火箭为8分，炸弹为6分，大王4分，小王3分，一个2为2分,大于6分就叫地主
+function AI:getHandCardScore()
+	local score = 0
+	if getLen(self.kingTable) == 2 then
+		score = score + 8
+	elseif getLen(self.kingTable) == 1 then
+		for k,v in pairs(self.kingTable) do
+			if k == 16 then
+				score = score + 3
+			else
+				score = score + 4
+			end
+		end
+	end
+	--炸弹
+	score = score + 6 * getLen(self.boomTable)
+	--2
+	score = score + 2 * getLen(self.backuplist[15])
+	print("分数为" .. score)
+	return score
 end
 
 --获取手牌  相对手牌、绝对手牌
@@ -144,7 +174,7 @@ function AI.classfyDoubleStraight(straightTable, list)
 			for k1,v1 in pairsByKeys(list) do
 				while true do 
 					if x == 1 or getLen(v1) ~= 2 then x = x + 1 break end --continue
-					if k1 - k == index then
+					if k1 - k == index and k1 <= 14 then
 						index = index + 1
 					end
 					break
@@ -200,7 +230,7 @@ function AI.getStraightFromList(threeTable, list)
 			for j,p in pairsByKeys(list) do
 				x = x + 1
 				while true do if x == 1 then break end  --1的时候continue
-					if j - k == index then
+					if j - k == index and j <= 14 then
 						index = index + 1
 					end
 					break
@@ -254,7 +284,7 @@ function AI.classfyThreeThree(threeTable)
 			j = j + 1
 			local flag = false
 			while true do if j == 1 then break end --跳过第一个
-				if i - k == index then
+				if k - i == index and k <= 14 then
 					index = index + 1
 					temp[k] = temp[k] or {}
 					temp[k] = v

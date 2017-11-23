@@ -13,4 +13,12 @@ TagUtils.cardDownNum = 9003
 TagUtils.cardUpType = 9004
 
 TagUtils.cardDownType = 9005
+
+TagUtils.jdzBtnTag =  9006 --叫地主
+
+TagUtils.bjdzBtnTag =  9007  --不叫地主
+
+TagUtils.mainLayer = 9008  --
+
+TagUtils.callDZLayer = 9010 
 return TagUtils

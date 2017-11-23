@@ -23,3 +23,10 @@ HANDOUT_SIDAIER = 108  		-- 四带二
 HANDOUT_ZHADAN = 109 		-- 炸弹
 HANDOUT_HUOJIAN = 110  		-- 火箭
 
+--假定火箭为8分，炸弹为6分，大王4分，小王3分，一个2为2分,大于6分就叫地主
+LEFT_USER = 4
+CENTER_USER = 2
+RIGHT_USER = 3
+
+--地主分
+DIZHUFEN = 6

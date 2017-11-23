@@ -25,4 +25,8 @@ function TableUtils.removeCardFromList(index, card)
 	end
 end
 
+function TableUtils.clear()
+	cardList = {}
+end
+
 return TableUtils
