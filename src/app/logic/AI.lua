@@ -12,9 +12,6 @@ function AI.new(list)
 	local self = {}
 	setmetatable(self, AI)
 	self.list = list
-	self.isBuJiaoDiZhu = false
-	self.isJiaoDiZhu = false
-	self.isBeginUser = false
 	self.backuplist = {}
 	for k,v in pairs(self.list) do
 		self.backuplist[k] = self.backuplist[k] or {}

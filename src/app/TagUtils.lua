@@ -21,4 +21,10 @@ TagUtils.bjdzBtnTag =  9007  --不叫地主
 TagUtils.mainLayer = 9008  --
 
 TagUtils.callDZLayer = 9010 
+
+TagUtils.byBtnTag = 9011
+
+TagUtils.cpBtnTag = 9012
+
+TagUtils.chupaiDZLayer = 9013
 return TagUtils

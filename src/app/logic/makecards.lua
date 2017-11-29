@@ -5,6 +5,7 @@
 
 local mod = {}
 
+package.path = package.path .. ";D:/cocos/doudizhu/cDouDiZhu/src/?.lua"
 require("app.define")
 math.randomseed(tostring(os.time()):reverse():sub(1, 6))  
 
@@ -26,7 +27,7 @@ function mod.makeCards()
 		temp[i] = i
 	end
 
-	local function getCrad(num)
+	local function getCard(num)
 		if num <= 0 then 
 			return {}
 		end
@@ -60,18 +61,18 @@ function mod.makeCards()
 
 	function test()
 		local s = {
-		[4] = {[1] = 1, [2] = 2}, 
-		[5] = {[1] = 1, [2] = 2, [3] = 4},
-		[6] = {[1] = 2},
-		[7] = {[1] = 2, [3] = 4, [2] = 1, [4] = 3},
-    	[8] = {[1] = 4, [2] = 2},
-    	-- [9] = {[1] = 3, [4] = 4},
+		-- [4] = {[1] = 1, [2] = 2}, 
+		-- [5] = {[1] = 1, [2] = 2},
+		-- [6] = {[1] = 1, [2] = 2},
+		[7] = {[1] = 1},
+    	-- [8] = {[1] = 1, [2] = 2},
+    	-- [9] = {[1] = 1, [2] = 2},
     	-- [10] = {[1] = 3, [2] = 2, [3] = 1},
     	-- [11] = {[1] = 1, [4] = 4},
     	-- [12] = {[1] = 1, [2] = 2},
-    	-- [13] = {[1] = 1, [3] = 3, [2] = 4},
-    	[16] = {[1] = 5},
-    	[17] = {[1] = 5}
+    	-- [13] = {[1] = 1, [3] = 3, [2] = 4, [4] = 2},
+    	-- [16] = {[1] = 5},
+    	-- [17] = {[1] = 5}
     	}
     		-- table.remove(temp, 1)table.remove(temp, 14)
     		-- table.remove(temp, 18)table.remove(temp, 24)
@@ -116,7 +117,7 @@ function mod.makeCards()
 
 	-- local lCard_2 = test()
 	local lCard_2 = getCard(17)
-	local lCard_1 = getCrad(3)
+	local lCard_1 = getCard(3)
 	local lCard_3 = getCard(17)
 	local lCard_4 = getCard(17)
 

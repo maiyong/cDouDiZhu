@@ -5,6 +5,7 @@ local TableUtils = require("app.TableUtils")
 local TagUtils = require("app.TagUtils")
 local mod = require("app.logic.makecards")
 local selecteCard = require("app.logic.selectCard")
+local User = require("app.model.User")
 local currUser = 2 --2为中间，3为右边，4为左边
 local beginUser = 0
 local nextUser = 0
@@ -13,6 +14,7 @@ local centerUser = nil
 local rightUser = nil
 local leftUser = nil
 local scheduleEntry = nil
+local AIUtils = require("app.logic.AIUtils")
 function MainScene:onCreate()
 	local layer = cc.Layer:create()
 	layer:setTag(TagUtils.mainLayer)
@@ -22,6 +24,10 @@ function MainScene:onCreate()
 	self:initBackgroundUI(layer, allCard) --加载背景图片并把牌加载到背景
 	-- mod.sortCard(allCard)
 	-- dump(allCard)
+	centerUser = User.new(AI.new(allCard[2]), TableUtils.getCardList(2))
+	rightUser = User.new(AI.new(allCard[3]), TableUtils.getCardList(3))
+	leftUser = User.new(AI.new(allCard[4]), TableUtils.getCardList(4))
+
     self:setCenterUserPosition()
 
 	self:setLeftUserPosition()   -- 设置左用户位置
@@ -37,15 +43,9 @@ function MainScene:onCreate()
 	currUser = beginUser
 	print("=====地主" .. beginUser)
 
-	centerUser = AI.new(allCard[2])
 	-- centerUser:getHandCardNum()
 	-- centerUser:getHandCardScore()
-	rightUser = AI.new(allCard[3])
-	leftUser = AI.new(allCard[4])
-	print(centerUser:getHandCardScore())
-	print(rightUser:getHandCardScore())
-	print(leftUser:getHandCardScore())
-    beginUser = 4
+    beginUser = 2
     if beginUser == LEFT_USER then
     	leftUser.isBeginUser = true
     elseif beginUser == CENTER_USER then
@@ -60,25 +60,32 @@ function MainScene:onCreate()
 	button:addTouchEventListener(function (sender, state)
 		if state == 2 then
 			print("fuck")
-			TableUtils.clear()
-			cc.Director:getInstance():getScheduler():unscheduleScriptEntry(scheduleEntry)
-		    local scene = display.newScene("mainScene")
-			scene:addChild(require("app.views.MainScene").new())
-			display.runScene(scene)
+			self:reStart()
 		end
 	end)
 	button:setPosition(0, display.top)
 	layer:addChild(button)
 end
 
+function MainScene:reStart()
+	TableUtils.clear()
+	cc.Director:getInstance():getScheduler():unscheduleScriptEntry(scheduleEntry)
+    local scene = display.newScene("mainScene")
+	scene:addChild(require("app.views.MainScene").new())
+	display.runScene(scene)
+end
+
 function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
+	if tType == 2 then
+		self:removeCallDZLayer()
+	end
 	local layer = self:getChildByTag(TagUtils.mainLayer)
 	local callDZLayer = cc.Layer:create()
 	callDZLayer:setTag(TagUtils.callDZLayer)
 	layer:addChild(callDZLayer)
 	--[[铃铛--]]
 	local clockBg = cc.Sprite:create("frame/clock.png")
-	clockBg:setPosition(display.cx,  TableUtils.getCardList(2)[1]:getPositionY() + clockBg:getContentSize().height * 1.5 + TableUtils.getCardList(2)[1]:getHeight()/2)
+	clockBg:setPosition(display.cx,  centerUser.cards[1]:getPositionY() + clockBg:getContentSize().height * 1.5 + centerUser.cards[1]:getHeight()/2)
 	callDZLayer:addChild(clockBg)
 	local timeShi = cc.Sprite:createWithSpriteFrameName("font_2_2.png")
 	local timeGe = cc.Sprite:createWithSpriteFrameName("font_2_0.png")
@@ -160,6 +167,7 @@ function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
 					self:jiaoDiZhu(RIGHT_USER)
 				elseif leftUser.isBuJiaoDiZhu and rightUser.isBuJiaoDiZhu then
 					print("都不叫地主, 我不抢，重新洗牌")
+					self:reStart()
 				else
 					print("我不叫地主")
 					self:jiaoDiZhu(RIGHT_USER)
@@ -172,6 +180,7 @@ function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
 				elseif leftUser.isBuJiaoDiZhu and rightUser.isBuJiaoDiZhu then
 					print("都不叫地主, 我抢了就是我的")
 					self:removeCallDZLayer()
+					self:createChuPaiButton()
 				else
 					print("我叫地主")
 					self:qiangDiZhu(RIGHT_USER)	
@@ -182,6 +191,7 @@ function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
 				if leftUser.isBuJiaoDiZhu and rightUser.isBuJiaoDiZhu then
 					print("都不抢地主,我来做地主，开始打牌")
 					self:removeCallDZLayer()
+					self:createChuPaiButton()
 					return
 				end
 				-- print("不抢地主")
@@ -226,6 +236,8 @@ function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
 				if leftUser.isJiaoDiZhu and rightUser.isJiaoDiZhu then
 					if centerUser.isBeginUser then
 						print("中叫，右家抢，左家抢，到我抢地主，抢完收工")
+						self:removeCallDZLayer()
+						self:createChuPaiButton()
 					elseif rightUser.isJiaoDiZhu then
 						print("右家叫，左家抢，我抢地主")
 						self:qiangDiZhu(RIGHT_USER)
@@ -236,6 +248,8 @@ function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
 				elseif leftUser.isJiaoDiZhu and rightUser.isBuJiaoDiZhu then
 					if centerUser.isBeginUser then
 						print("我叫，右家不叫，左家抢，轮到我抢, 完事")
+						self:removeCallDZLayer()
+						self:createChuPaiButton()
 					else
 						print("右家不叫，左家叫，我抢，轮到左家")
 						self:qiangDiZhu(LEFT_USER)
@@ -243,11 +257,15 @@ function MainScene:createJiaoDiZhuButton(tType) -- 1叫地主 --2抢地主
 				elseif leftUser.isBuJiaoDiZhu and rightUser.isJiaoDiZhu then
 					if centerUser.isBeginUser then
 						print("我叫，右抢，左不抢，轮到我抢，完事")
+						self:removeCallDZLayer()
+						self:createChuPaiButton()
 					elseif rightUser.isBeginUser then
 						print("右叫，左不抢，我抢，轮到右抢")
 						self:qiangDiZhu(RIGHT_USER)
 					else
 						print("左不叫，我叫，右叫, 轮到我为地主")
+						self:removeCallDZLayer()
+						self:createChuPaiButton()
 					end
 				elseif leftUser.isJiaoDiZhu then
 					print("左家叫，我抢，轮到右家")
@@ -274,7 +292,7 @@ end
 
 function MainScene:jiaoDiZhu(beginUser)
 	if beginUser == LEFT_USER then
-		if leftUser:getHandCardScore() >= DIZHUFEN then
+		if leftUser.numCards:getHandCardScore() >= DIZHUFEN then
 			if rightUser.isBuJiaoDiZhu and centerUser.isBuJiaoDiZhu then
 				print("都不叫地主，左家是地主")
 				return
@@ -294,7 +312,7 @@ function MainScene:jiaoDiZhu(beginUser)
 	elseif beginUser == CENTER_USER then
 		self:createJiaoDiZhuButton(1)
 	else
-		if rightUser:getHandCardScore() >= DIZHUFEN then
+		if rightUser.numCards:getHandCardScore() >= DIZHUFEN then
 			if leftUser.isBuJiaoDiZhu and centerUser.isBuJiaoDiZhu then
 				print("都不叫地主，右家是地主")
 				return
@@ -316,7 +334,7 @@ end
 
 function MainScene:qiangDiZhu(beginUser)
 	if beginUser == LEFT_USER then
-		if leftUser:getHandCardScore() >= DIZHUFEN then
+		if leftUser.numCards:getHandCardScore() >= DIZHUFEN then
 			leftUser.isJiaoDiZhu = true
 			if rightUser.isJiaoDiZhu and centerUser.isJiaoDiZhu then
 				if leftUser.isBeginUser then
@@ -374,6 +392,8 @@ function MainScene:qiangDiZhu(beginUser)
 					print("左不叫，中叫，右不抢，中为地主，到不了")
 				else
 					print("中叫，右不抢，左不抢，中为地主")
+					self:removeCallDZLayer()
+					self:createChuPaiButton()
 					-- self:qiangDiZhu(RIGHT_USER)
 				end
 			elseif rightUser.isJiaoDiZhu then
@@ -384,7 +404,7 @@ function MainScene:qiangDiZhu(beginUser)
 			end
 		end
 	else
-		if rightUser:getHandCardScore() >= DIZHUFEN then
+		if rightUser.numCards:getHandCardScore() >= DIZHUFEN then
 			rightUser.isJiaoDiZhu = true
 			if centerUser.isJiaoDiZhu and leftUser.isJiaoDiZhu then
 				if rightUser.isBeginUser then
@@ -431,8 +451,12 @@ function MainScene:qiangDiZhu(beginUser)
 			elseif centerUser.isJiaoDiZhu and leftUser.isBuJiaoDiZhu then
 				if rightUser.isBeginUser then
 					print("右不叫，左不叫，中叫，中为地主")
+					self:removeCallDZLayer()
+					self:createChuPaiButton()
 				else
 					print("左不叫，中叫，右叫，中家为地主")
+					self:removeCallDZLayer()
+					self:createChuPaiButton()
 					-- self:qiangDiZhu(LEFT_USER)
 				end
 			elseif centerUser.isBuJiaoDiZhu and leftUser.isJiaoDiZhu then
@@ -452,14 +476,50 @@ function MainScene:qiangDiZhu(beginUser)
 	end
 end
 
-function MainScene:createChuPaiButton(layer)
+function MainScene:createChuPaiButton()
+	print("====创建啊")
+	local layer = self:getChildByTag(TagUtils.mainLayer)
+	local callDZLayer = cc.Layer:create()
+	callDZLayer:setTag(TagUtils.chupaiDZLayer)
+	layer:addChild(callDZLayer)
+	--[[铃铛--]]
+	local clockBg = cc.Sprite:create("frame/clock.png")
+	clockBg:setPosition(display.cx,  centerUser.cards[1]:getPositionY() + clockBg:getContentSize().height * 1.5 + centerUser.cards[1]:getHeight()/2)
+	callDZLayer:addChild(clockBg)
+	local timeShi = cc.Sprite:createWithSpriteFrameName("font_2_2.png")
+	local timeGe = cc.Sprite:createWithSpriteFrameName("font_2_0.png")
+	timeShi:setScale(0.8, 0.8)
+	clockBg:addChild(timeShi)
+	timeShi:setPosition(clockBg:getContentSize().width/2 - timeShi:getContentSize().width/3, clockBg:getContentSize().height/2 -5)
+	clockBg:addChild(timeGe)
+	timeGe:setScale(0.8, 0.8)
+	timeGe:setPosition(clockBg:getContentSize().width/2 + timeGe:getContentSize().width/3, clockBg:getContentSize().height/2 - 5)
+	local time = 20
+	scheduleEntry = clockBg:getScheduler():scheduleScriptFunc(function ()
+		time = time - 1
+		if time < 0 then
+			-- self:removeCallDZLayer()
+			return
+		end
+		timeShi:setSpriteFrame(string.format("font_2_%d.png", time/10))
+		timeGe:setSpriteFrame(string.format("font_2_%d.png", time%10))
+	end, 1, false)
 	local chupaiTable = {}
+	local chupaiTable_old = {}
 	local chupai = cc.Sprite:create("btn/btn_blue_small.png")
+	chupai:setTag(TagUtils.cpBtnTag)
 	-- chupai:init("btn_blue_big_1.png", "btn_blue_big_2.png", "btn_blue_big_1.png", ccui.TextureResType.plistType)
-	chupai:setPosition(display.cx, TableUtils.getCardList(2)[1]:getPositionY() + chupai:getContentSize().height * 1.5 + TableUtils.getCardList(2)[1]:getHeight()/2)
-	local font = cc.Sprite:create("fonts/btnfont_chupai.png")
-	font:setPosition(chupai:getContentSize().width/2, chupai:getContentSize().height/2 - 3)
-	chupai:addChild(font)
+	chupai:setPosition(clockBg:getPositionX() + chupai:getContentSize().width * 2/3, clockBg:getPositionY())
+	local chupai_text = cc.Sprite:create("fonts/btnfont_chupai.png")
+	chupai_text:setPosition(chupai:getContentSize().width/2, chupai:getContentSize().height/2 - 3)
+	chupai:addChild(chupai_text)
+
+	local buchu = cc.Sprite:create("btn/btn_blue_small.png")
+	buchu:setTag(TagUtils.byBtnTag)
+	buchu:setPosition(clockBg:getPositionX() - buchu:getContentSize().width * 2/3, clockBg:getPositionY())
+	local buchu_text = cc.Sprite:create("fonts/btnfont_buyao.png")
+	buchu_text:setPosition(buchu:getContentSize().width/2, buchu:getContentSize().height/2 - 3)
+	buchu:addChild(buchu_text)
 
 	local listener = cc.EventListenerTouchOneByOne:create()
 	listener:setSwallowTouches(true)
@@ -476,41 +536,65 @@ function MainScene:createChuPaiButton(layer)
 		return false
 	end, cc.Handler.EVENT_TOUCH_BEGAN)
 	listener:registerScriptHandler(function (touch, event)
-		-- body
 	end, cc.Handler.EVENT_TOUCH_MOVED)
 	listener:registerScriptHandler(function (touch, event)
 		local node = event:getCurrentTarget()
+		chupaiTable = {}
 		node:runAction(cc.ScaleTo:create(0.1, 1.0))
-		local w = 0
-		for i = #TableUtils.getCardList(2), 1, -1 do
-			card = TableUtils.getCardList(2)[i]
-			if not card.isSelected then
-				--出牌
-				w = w + 1
-				TableUtils.removeCardFromList(2, card)
-				table.insert(chupaiTable, card)
+		if node:getTag() == TagUtils.byBtnTag then
+			print("不要，到下家")
+		else
+			local w = 0
+			local temp = {}
+			for i = #centerUser.cards, 1, -1 do
+				card = centerUser.cards[i]
+				if not card.isSelected then
+					--出牌
+					w = w + 1
+					table.insert(chupaiTable, card)
+					temp[card.cardNum] = temp[card.cardNum] or {}
+					table.insert(temp[card.cardNum], card.cardType)
+				end
 			end
+			dump(temp)
+			if not AIUtils.isAccord(temp) then
+				print("你的牌不符合标准")
+				return 
+			end
+			if getLen(chupaiTable_old) >0 then
+				for k,v in pairs(chupaiTable_old) do
+					v:removeFromParent()
+				end
+			end
+			chupaiTable_old = chupaiTable
+			for i,v in ipairs(chupaiTable) do
+				TableUtils.removeCardFromList(2, v)
+			end
+			local beginX = (display.width - (25 * (#chupaiTable - 1) + chupaiTable[1]:getWidth()))/2
+			w = 0
+			local zOrder = 1
+			for i = #chupaiTable, 1 , -1 do
+				v = chupaiTable[i]
+				w = w + 1
+				v:setPosition(beginX + w * 25, display.cy)
+				v:setLocalZOrder(zOrder)
+				zOrder = zOrder + 1
+				-- layer:addChild(v)
+			end
+			self:setCenterUserPosition()
 		end
-		local beginX = (display.width - (25 * (#chupaiTable - 1) + chupaiTable[1]:getWidth()))/2
-		w = 0
-		local zOrder = 1
-		for i = #chupaiTable, 1 , -1 do
-			v = chupaiTable[i]
-			w = w + 1
-			v:setPosition(beginX + w * 25, display.cy)
-			v:setLocalZOrder(zOrder)
-			zOrder = zOrder + 1
-			-- layer:addChild(v)
-		end
-		self:setCenterUserPosition()
+
 	end, cc.Handler.EVENT_TOUCH_ENDED)
 	local dispatcher = cc.Director:getInstance():getEventDispatcher()
+	local buchu_listener = listener:clone()
+	dispatcher:addEventListenerWithSceneGraphPriority(buchu_listener, buchu)
 	dispatcher:addEventListenerWithSceneGraphPriority(listener, chupai)
-	layer:addChild(chupai)
+	callDZLayer:addChild(chupai)
+	callDZLayer:addChild(buchu)
 end
 
 function MainScene:setCenterUserPosition()
-    local myCardList = TableUtils.getCardList(2)
+    local myCardList = centerUser.cards
     if #myCardList <= 0 then return end
     local beginX = (display.width - (25 * (#myCardList - 1) + myCardList[1]:getWidth()))/2
 	for i, v in pairsByKeys(myCardList) do
@@ -595,7 +679,7 @@ function MainScene:initClickListener(layer)
 		movePos = nil
 		testTable = {}
 		self.selectedTable = {}
-		for i,v in ipairs(TableUtils.getCardList(2)) do
+		for i,v in ipairs(centerUser.cards) do
 			testTable[i] = v
 		end
 		return true
