@@ -129,6 +129,7 @@ function JiaoDiZhu.qiangDiZhu(beginUser, leftUser, rightUser, centerUser, create
 			if centerUser.isJiaoDiZhu and leftUser.isJiaoDiZhu then
 				if rightUser.isBeginUser then
 					print("右叫，左抢，中抢，右家再抢地主，抢完收工")
+					rightUser.numCards:chupai()
 				else
 					print("左叫，中抢，右抢，到左")
 					JiaoDiZhu.qiangDiZhu(LEFT_USER, leftUser, rightUser, centerUser, createJiaoDiZhuButton, 
@@ -137,6 +138,7 @@ function JiaoDiZhu.qiangDiZhu(beginUser, leftUser, rightUser, centerUser, create
 			elseif centerUser.isJiaoDiZhu and leftUser.isBuJiaoDiZhu then
 				if rightUser.isBeginUser then
 					print("右叫，左不抢，中抢，轮到右抢，收工")
+					rightUser.numCards:chupai()
 				else
 					print("左不叫，中叫，右抢，轮到中家")
 					createJiaoDiZhuButton(2)

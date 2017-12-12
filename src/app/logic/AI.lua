@@ -29,7 +29,7 @@ function AI:classfyCard()
 	self.threethreeTable = AI.classfyThreeThree(self.threeTable)
 	self.straightTable, self.list = AI.classfyStraight(self.threeTable, self.list)
 	self.doubleStraightTable = AI.classfyDoubleStraight(self.straightTable, self.list)
-	-- self.doubleTable = AI.classfyDouble(self.list)
+	self.doubleTable = AI.classfyDouble(self.list)
 	-- dump(self.kingTable, "王")--王
 	-- dump(self.boomTable, "炸弹")--炸弹
 	-- dump(self.threeTable, "三条")--三条
@@ -125,12 +125,13 @@ function AI.classfyDoubleStraight(straightTable, list)
 	--顺子取连对
 	local doubleStraightTable1 = {}
 	local doubleStraightTable = {}
+	local num = 1
 	for k,v in pairsByKeys(straightTable) do
 		local x = 0
 		for i,b in pairsByKeys(straightTable) do
 			while true do
 				x = x + 1
-				if x == 1 or getLen(v) ~= getLen(b) then break end
+				if x == num or getLen(v) ~= getLen(b) then break end
 					local flag = true
 					for k1,v1 in pairs(v) do
 						if not v[k1] or not b[k1] then
@@ -160,6 +161,7 @@ function AI.classfyDoubleStraight(straightTable, list)
 				break
 			end			
 		end
+		num = num + 1
 	end
 	
 
@@ -249,9 +251,14 @@ function AI.getStraightFromList(threeTable, list)
 								list[i] = nil
 							else
 								local temp = {}
-								table.insert(temp, list[i][1])
+								local tempIndex = 0
+								for g,h in pairs(list[i]) do
+									tempIndex = g
+									break
+								end
+								table.insert(temp,list[i][tempIndex])
 								straightTable[szNum][i] = temp 
-								list[i][1] = nil
+								list[i][tempIndex] = nil
 								if getLen(list[i]) == 2 then
 									threeTable[i] = nil
 								end
@@ -308,7 +315,7 @@ end
 function AI.classfyThree(list)
 	local threeTable = {}
 	for k,v in pairs(list) do
-		if #v == 3 then
+		if getLen(v) == 3 then
 			if not threeTable[k] then
 				threeTable[k] = {}
 			end
@@ -347,7 +354,7 @@ end
 function AI.classfyBoom(list)
 	local boomTable = {}
 	for i,v in pairs(list) do
-		if #v == 4 then --炸弹
+		if getLen(v) == 4 then --炸弹
 			if not boomTable[i] then
 				boomTable[i] = {}
 			end
@@ -361,13 +368,289 @@ function AI.classfyBoom(list)
 	return boomTable
 end
 
---出牌
-function AI.chupai(cardList)
+--先出单牌
+function AI:chudan(isDan)
+	--先出单牌因为单牌可以用三条、三顺等带出，所以在出单牌时，
+	--应该先检测一下三条＋三顺（中三条）的数量，如果所有三条数量 <= 对子＋单牌数量总和－2时，
+	--出单牌，否则出三带1等等。
+	local danLen = getLen(self.list)
+	local shuangLen = getLen(self.doubleTable)
+	local temp = {}
+	local len = isDan and {danLen} or {shuangLen}
+	local tempList = isDan and self.list or self.doubleTable
+	if len[1] > 0 then
+		local threeLen = getLen(self.threeTable)
+		local threethreeLen = getLen(self.threethreeTable)
+		if (danLen + shuangLen - 2) >= (threeLen + threethreeLen) then
+			print("出单牌")
+			for k,v in pairsByKeys(tempList) do
+				-- print("出了" .. k)
+				temp[k] = temp[k] or {}
+				temp[k] = v
+				tempList[k] = nil
+				break
+			end
+		else
+			print("出三带一or2")
+			if threeLen > 0 then
+				for k,v in pairsByKeys(self.threeTable) do
+					for k1, v1 in pairsByKeys(tempList) do
+						temp[k1] = temp[k1] or {}
+						temp[k1] = v1
+						tempList[k1] = nil
+						break
+					end
+					temp[k] = temp[k] or {}
+					temp[k] = v
+					self.threeTable[k] = nil
+					break
+				end
+			-- else
+			-- 	for k,v in pairsByKeys(self.threethreeTable) do
+			-- 		local tempLen = getLen(v)
+			-- 		for k1, v1 in pairsByKeys(tempList) do
+			-- 			if tempLen > 0 then
+			-- 				tempLen = tempLen - 1
+			-- 				temp[k1] = temp[k1] or {}
+			-- 				temp[k1] = v1
+			-- 				tempList[k1] = nil
+			-- 			else
+			-- 				break
+			-- 			end
+			-- 		end
+			-- 		temp[k] = temp[k] or {}
+			-- 		temp[k] = v
+			-- 		self.threeTable[k] = nil
+			-- 		break
+			-- 	end
+			end
+		end
+		dump(temp)
+		if getLen(temp) > 0 then
+			return true
+		else
+			return false
+		end
+	end
+end
 
+function AI:chuShuangShun()
+	--直接出
+	local len = getLen(self.doubleStraightTable)
+	local temp = {}
+	if len > 0 then
+		for k,v in pairsByKeys(self.doubleStraightTable) do
+			temp = v
+			table.remove(self.doubleStraightTable, k)
+			break
+		end
+	end
+	dump(temp)
+	if getLen(temp) > 0 then
+		return true
+	else
+		return false
+	end
+end
+
+function AI:chuShunZi()
+	--直接出
+	local len = getLen(self.straightTable)
+	local temp = {}
+	-- dump(self.straightTable)
+	if len > 0 then
+		for k,v in pairsByKeys(self.straightTable) do
+			temp = v
+			self.straightTable[k] = nil
+			table.remove(self.straightTable, k)
+			break
+		end
+	end
+	dump(temp)
+	-- dump(self.straightTable)
+	if getLen(temp) > 0 then
+		return true
+	else
+		return false
+	end
+end
+
+function AI:chuSanShun()
+	--因为三顺出牌可以带两张（或更多）单牌或两个（或更多）对子，所以与出三条一样，
+	--需要检测是否有单牌或对子。如果有足够多的单牌或对子， 则将其带出。如果有单牌，
+	--但没有足够多的单牌，则检查是否有6连以上的连牌，如果有将连牌的最小张数当作单牌带出。
+	--如果有对子，但没有足够多的对子，则检 查是否有4连以上的双顺，如果有将双顺的最小对子当作对子带出。
+	--在带牌时，除非是只剩两手牌，否则不能带王或2。 
+	local len = getLen(self.threethreeTable)
+	local temp = {}
+	if len > 0 then
+		print("三顺")
+		local threeNum = 0
+		for k,v in pairsByKeys(self.threethreeTable) do
+			-- temp[k] = temp[k] or {}
+			temp = v
+			threeNum = getLen(v)
+			self.threethreeTable[k] = nil
+			break
+		end
+		local num = self:getHandCardNum()
+		local listNum = getLen(self.list)
+		local doubleNum = getLen(self.doubleTable)
+		if getLen(self.list) >= threeNum then
+			local index = 1
+			for k,v in pairsByKeys(self.list) do
+				if index > threeNum then
+					break
+				end
+				temp[k] = temp[k] or {}
+				temp[k] = v
+				self.list[k] = nil
+				index = index + 1
+ 	        end 
+		elseif getLen(self.doubleTable) >= threeNum then
+			local index = 1
+			for k,v in pairsByKeys(self.doubleTable) do
+				if index > threeNum then
+					break
+				end
+				temp[k] = temp[k] or {}
+				temp[k] = v
+				self.doubleTable[k] = nil
+				index = index + 1
+ 	        end
+        else 
+        	if listNum > 0 then
+        		dump(self.straightTable)
+        		for k,v in pairsByKeys(self.straightTable) do
+        			if getLen(v) >= 5 + threeNum - listNum then
+        				local index = 1
+        				for k1,v1 in pairsByKeys(v) do
+        					if index > threeNum - listNum then
+        						break
+        					end
+        					temp[k1] = temp[k1] or {}
+        					temp[k1] = v1
+        					v[k1] = nil
+        					index = index + 1
+        				end
+        				for k1,v1 in pairs(self.list) do
+        					temp[k1] = temp[k1] or {}
+        					temp[k1] = v1
+        					self.list[k1] = nil
+        				end
+        				break
+        			end
+        		end
+        		dump(self.straightTable)
+        	elseif doubleNum > 0 then
+        		for k,v in pairsByKeys(self.doubleStraightTable) do
+        			if getLen(v) >= 3 + threeNum - doubleNum then
+        				local index = 1
+        				for k1,v1 in pairsByKeys(v) do
+        					if index > threeNum - doubleNum then
+        						break
+        					end
+        					temp[k1] = temp[k1] or {}
+        					temp[k1] = v1
+        					v[k1] = nil
+        					index = index + 1
+        				end
+        				for k1,v1 in pairs(self.doubleTable) do
+        					temp[k1] = temp[k1] or {}
+        					temp[k1] = v1
+        					self.doubleTable[k1] = nil
+        				end
+        				break
+        			end
+        		end
+        	else
+        		print("=======")
+        	end
+		end
+	end
+	dump(temp)
+	-- dump(self.straightTable)
+	if getLen(temp) > 0 then
+		return true
+	else
+		return false
+	end
+end
+
+function AI:chuSanTiao()
+	--2 三条的出牌原则：因为三条出牌可以带一张单牌或一个对子，所以在出三条时需要检测是否有单牌，
+	--如果有，则带一张最小的单牌，如果没有，则再检测是否存在对子，如果有，则跟一个最小的对子，
+	--如果单牌和对子都没有，则出三条。          在带牌时，除非是只剩两手牌，否则不能带王或2。          
+	local len = getLen(self.threeTable)
+	local temp = {}
+	if len > 0 then
+		local num = self:getHandCardNum()
+		if getLen(self.list) > 0 then
+			for k,v in pairsByKeys(self.list) do
+				if k > 14 then
+					if num == 2 then
+						temp[k] = temp[k] or {}
+						temp[k] = v
+						self.list[k] = nil
+					end
+				else 
+					temp[k] = temp[k] or {}
+					temp[k] = v
+					self.list[k] = nil
+				end
+				break
+			end
+		else
+			for k,v in pairsByKeys(self.doubleTable) do
+				if k > 14 then
+					if num == 2 then
+						temp[k] = temp[k] or {}
+						temp[k] = v
+						self.list[k] = nil
+					end
+				else 
+					temp[k] = temp[k] or {}
+					temp[k] = v
+					self.list[k] = nil
+				end
+				break
+			end
+		end
+		for k,v in pairsByKeys(self.threeTable) do
+			temp[k] = temp[k] or {}
+			temp[k] = v
+			self.list[k] = nil	
+			break
+		end
+	end
+	dump(temp)
+	-- dump(self.straightTable)
+	if getLen(temp) > 0 then
+		return true
+	else
+		return false
+	end
+end
+
+--出牌
+function AI:chupai()
+	if self:chudan(1) then
+		print("单或者3带1")
+	elseif self:chudan() then
+		print("双或者三带二")
+	elseif self:chuShuangShun() then
+		print("双顺")
+	elseif self:chuShunZi() then
+		print("顺子")
+	elseif self:chuSanShun() then
+		print("出三顺")		
+	elseif self:chuSanTiao() then
+		print("出三条")
+	end
 end
 
 --跟牌
-function AI.genpai(cardList, cards)
+function AI:genpai(cardList, cards)
 
 end
 
